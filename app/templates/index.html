@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation Engine</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .movie-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .star {
+            transition: color 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .star:hover, .star.active {
+            color: #fbbf24;
+        }
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 500ms ease-in;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        .htmx-request.htmx-indicator {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold text-yellow-400">
+                        <i class="fas fa-film mr-2"></i>MovieRec
+                    </h1>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="/" class="hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-home mr-1"></i>Home
+                    </a>
+                    <a href="/movies" class="hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-search mr-1"></i>Search
+                    </a>
+                    <a href="/recommendations" class="hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-magic mr-1"></i>Recommendations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-5xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+                Discover Your Next Favorite Movie
+            </h2>
+            <p class="text-xl text-gray-300 mb-8">
+                Get personalized movie recommendations based on your taste
+            </p>
+            
+            <!-- Quick Search -->
+            <div class="max-w-md mx-auto">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        placeholder="Search for a movie..."
+                        class="w-full px-4 py-3 pl-12 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-yellow-400 text-white"
+                        hx-get="/api/movies/search"
+                        hx-trigger="keyup changed delay:500ms"
+                        hx-target="#search-results"
+                        hx-indicator="#search-spinner"
+                        name="q"
+                    >
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <div id="search-spinner" class="htmx-indicator absolute right-4 top-1/2 transform -translate-y-1/2">
+                        <i class="fas fa-spinner fa-spin text-yellow-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="search-results" class="mb-12"></div>
+
+        <!-- Popular Movies Section -->
+        <section class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-3xl font-bold">Popular Movies</h3>
+                <button 
+                    class="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-lg font-semibold transition-colors"
+                    hx-get="/api/movies/popular"
+                    hx-target="#popular-movies"
+                    hx-indicator="#popular-spinner"
+                >
+                    <span id="popular-spinner" class="htmx-indicator">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                    </span>
+                    Load Popular Movies
+                </button>
+            </div>
+            <div id="popular-movies"></div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="grid md:grid-cols-3 gap-8 mt-16">
+            <div class="text-center p-6 bg-gray-800 rounded-lg">
+                <i class="fas fa-star text-4xl text-yellow-400 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Rate Movies</h4>
+                <p class="text-gray-400">Rate movies you've watched to get better recommendations</p>
+            </div>
+            <div class="text-center p-6 bg-gray-800 rounded-lg">
+                <i class="fas fa-robot text-4xl text-blue-400 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Smart Recommendations</h4>
+                <p class="text-gray-400">Get personalized suggestions based on your preferences</p>
+            </div>
+            <div class="text-center p-6 bg-gray-800 rounded-lg">
+                <i class="fas fa-search text-4xl text-green-400 mb-4"></i>
+                <h4 class="text-xl font-semibold mb-2">Discover Movies</h4>
+                <p class="text-gray-400">Search and explore thousands of movies</p>
+            </div>
+        </section>
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-16 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2025 Movie Recommendation Engine. Built with FastAPI & HTMX.</p>
+        </div>
+    </footer>
+</body>
+</html>

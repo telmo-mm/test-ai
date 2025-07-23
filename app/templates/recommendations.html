@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations - MovieRec</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .movie-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .star {
+            transition: color 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .star:hover, .star.active {
+            color: #fbbf24;
+        }
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 500ms ease-in;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold text-yellow-400">
+                        <i class="fas fa-film mr-2"></i>MovieRec
+                    </h1>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="/" class="hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-home mr-1"></i>Home
+                    </a>
+                    <a href="/movies" class="hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-search mr-1"></i>Search
+                    </a>
+                    <a href="/recommendations" class="text-yellow-400">
+                        <i class="fas fa-magic mr-1"></i>Recommendations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+                <i class="fas fa-magic mr-3"></i>Your Recommendations
+            </h2>
+            <p class="text-xl text-gray-300">
+                Personalized movie suggestions based on your ratings
+            </p>
+        </div>
+
+        <!-- Refresh Button -->
+        <div class="text-center mb-8">
+            <button 
+                class="bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-black px-8 py-3 rounded-lg font-bold transition-all transform hover:scale-105"
+                hx-get="/api/recommendations/"
+                hx-target="#recommendations-content"
+                hx-indicator="#refresh-loading"
+            >
+                <span id="refresh-loading" class="htmx-indicator">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                </span>
+                <i class="fas fa-sync-alt mr-2"></i>Refresh Recommendations
+            </button>
+        </div>
+
+        <!-- Recommendations Content -->
+        <div 
+            id="recommendations-content"
+            hx-get="/api/recommendations/"
+            hx-trigger="load"
+            hx-indicator="#initial-loading"
+        >
+            <div id="initial-loading" class="text-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl text-yellow-400 mb-4"></i>
+                <p class="text-xl text-gray-300">Loading your personalized recommendations...</p>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="bg-gray-800 rounded-lg p-6 mt-12">
+            <h3 class="text-2xl font-bold mb-4 text-yellow-400">
+                <i class="fas fa-lightbulb mr-2"></i>How Recommendations Work
+            </h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-lg font-semibold mb-2 text-blue-400">Rate Movies</h4>
+                    <p class="text-gray-300">Rate movies you've watched to help us understand your taste. The more you rate, the better your recommendations become!</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-2 text-green-400">Get Suggestions</h4>
+                    <p class="text-gray-300">Based on your ratings, we find similar movies and suggest new ones you might enjoy. It's like having a personal movie curator!</p>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <a href="/movies" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-block">
+                    <i class="fas fa-search mr-2"></i>Start Rating Movies
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-16 py-8">
+        <div class="container mx-auto px-4 text-center text-gray-400">
+            <p>&copy; 2025 Movie Recommendation Engine. Built with FastAPI & HTMX.</p>
+        </div>
+    </footer>
+</body>
+</html>

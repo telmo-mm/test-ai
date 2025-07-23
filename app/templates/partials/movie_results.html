@@ -1,0 +1,109 @@
+{% if movies %}
+<div class="mb-6">
+    <h3 class="text-2xl font-bold mb-4">
+        {% if query %}
+            Results for "{{ query }}"
+            {% if total_results %}
+                <span class="text-gray-400 text-lg">({{ total_results }} movies found)</span>
+            {% endif %}
+        {% endif %}
+    </h3>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for movie in movies %}
+    <div class="movie-card bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+        <!-- Movie Poster -->
+        <div class="relative group">
+            <img 
+                src="{{ movie.poster_url }}" 
+                alt="{{ movie.title }}"
+                class="w-full h-80 object-cover"
+                onerror="this.src='/static/images/no-poster.jpg'"
+            >
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-70 transition-all duration-300 flex items-center justify-center">
+                <button 
+                    class="opacity-0 group-hover:opacity-100 bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-semibold transition-all"
+                    hx-get="/api/movies/{{ movie.id }}/details"
+                    hx-target="#movie-details-{{ movie.id }}"
+                    hx-swap="innerHTML"
+                >
+                    <i class="fas fa-info-circle mr-2"></i>Details
+                </button>
+            </div>
+        </div>
+        
+        <!-- Movie Info -->
+        <div class="p-4">
+            <h4 class="font-bold text-lg mb-2 line-clamp-2">{{ movie.title }}</h4>
+            <p class="text-gray-400 text-sm mb-3 line-clamp-3">{{ movie.overview }}</p>
+            
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-yellow-400 font-semibold">
+                    <i class="fas fa-star mr-1"></i>{{ movie.vote_average }}
+                </span>
+                <span class="text-gray-500 text-sm">{{ movie.release_date[:4] if movie.release_date else 'N/A' }}</span>
+            </div>
+            
+            <!-- Rating Stars -->
+            <div class="flex items-center justify-between">
+                <div class="flex space-x-1" id="rating-stars-{{ movie.id }}">
+                    {% for i in range(1, 6) %}
+                    <i class="fas fa-star star text-gray-600 hover:text-yellow-400 cursor-pointer"
+                       data-rating="{{ i }}"
+                       onclick="rateMovie({{ movie.id }}, {{ i }})">
+                    </i>
+                    {% endfor %}
+                </div>
+                <div id="rating-feedback-{{ movie.id }}" class="text-sm text-green-400"></div>
+            </div>
+        </div>
+        
+        <!-- Details Container -->
+        <div id="movie-details-{{ movie.id }}" class="hidden"></div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function rateMovie(movieId, rating) {
+    // Update visual feedback immediately
+    const stars = document.querySelectorAll(`#rating-stars-${movieId} .star`);
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.add('text-yellow-400');
+            star.classList.remove('text-gray-600');
+        } else {
+            star.classList.add('text-gray-600');
+            star.classList.remove('text-yellow-400');
+        }
+    });
+    
+    // Send rating to server
+    const formData = new FormData();
+    formData.append('movie_id', movieId);
+    formData.append('rating', rating);
+    
+    fetch('/api/ratings/rate', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById(`rating-feedback-${movieId}`).innerHTML = `Rated ${rating} stars!`;
+        setTimeout(() => {
+            document.getElementById(`rating-feedback-${movieId}`).innerHTML = '';
+        }, 2000);
+    })
+    .catch(error => {
+        console.error('Error rating movie:', error);
+    });
+}
+</script>
+
+{% else %}
+<div class="text-center text-gray-400 py-12">
+    <i class="fas fa-search text-4xl mb-4"></i>
+    <p class="text-xl">No movies found. Try a different search term.</p>
+</div>
+{% endif %}

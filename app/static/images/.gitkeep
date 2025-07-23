@@ -1,0 +1,4 @@
+# Copy the example environment file to create your local .env
+cp .env.example .env
+
+# Then edit .env to add your TMDB API key

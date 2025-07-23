@@ -21,8 +21,8 @@ An interactive movie recommendation system built with FastAPI and HTMX.
 
 1. **Clone and setup**:
 ```bash
-git clone <repository-url>
-cd movie-recommender
+git clone https://github.com/telmo-mm/test-ai.git
+cd test-ai
 make dev-setup
 ```
 
